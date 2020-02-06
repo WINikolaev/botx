@@ -1,5 +1,5 @@
-import threading
-from threading import Thread
+import  threading
+from    threading import Thread
 
 
 
@@ -17,10 +17,13 @@ class СyclicTimer(Thread):
         if self.name:
             self.setName(self.name)
 
+    def __enter__(self):
+        return self
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
 
-    def stop(self):
+    def _stop(self):
         """Stop the timer if it hasn't finished yet."""
         self.event.set()
         if self.lock.locked():
@@ -31,12 +34,17 @@ class СyclicTimer(Thread):
         while self.is_alive() and not self.stop_while:
             res = self.event.wait(self.period)
             if not self.event.is_set():
-                self.handler()
+                """Handler exceptions"""
+                try:
+                    self.handler()
+                except Exception as e:
+                    print('EXCEPT: ', e)
+                    self._stop()
 
     '''For subclass:
     def handler(self):
         with self.lock:
-            if not self.stop_while:
+            if self.stop_while:
                 return 1
     '''
     def handler(self):

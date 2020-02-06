@@ -1,6 +1,7 @@
-from cyclic_timer import СyclicTimer as ctimer
+from cyclic_timer import СyclicTimer
 import pickle
 import os
+import datetime
 
 from enum import Enum
 import bot_button
@@ -46,36 +47,46 @@ class User:
         self.currentLvl = currentLvl
 
 
-# operation of user
-class cData_users(ctimer):
+
+''' Class for operate on users like backup data'''
+class Backuper(СyclicTimer):
     usersDict = {}
-    def __init__(self, period, name, bot):
-        ctimer.__init__(self, period=period, name=name)
+    def __init__(self, period, name, bot=None):
+        СyclicTimer.__init__(self, period=period, name=name)
         self.bot = bot
-        # get data
-        self._get_data()
+        self.__get_data()
 
-
-    def _get_data(self):
-        print('_get_data')
+    ''' if we found backup.pickle file we can think that we have backup data.
+        So, we need to get it.
+    '''
+    def __get_data(self):
         if os.path.exists('backup.pickle'):
             with open('backup.pickle', 'rb') as bp:
                 self.usersDict = pickle.load(bp)
+        print('usersDict has -> ', self.usersDict)
 
     def save_data(self):
-        print('save_data')
         with open('backup.pickle', 'wb') as bp:
             pickle.dump(self.usersDict, bp)
-
+        print('Data saved')
 
     def end(self):
         self.save_data()
-        self.stop()
+        self._stop()
 
     def handler(self):
         print('usersDict: ', self.usersDict)
+        if self.stop_while:
+            return 1
+
         with self.lock:
-            if not self.stop_while:
-                return 1
+            print('backup data')
             with open('backup.pickle', 'wb') as bp:
                 pickle.dump(self.usersDict, bp)
+
+        if self.bot:
+            for key in self.usersDict.keys():
+                i = 0
+                while i < 1:
+                    self.bot.send_message(int(key), 'backup data at {}'.format(datetime.datetime.now()))
+                    i += 1

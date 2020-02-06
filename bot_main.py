@@ -1,29 +1,31 @@
 import telebot
-from telebot import types
+
 from telebot.types import Message
 from telebot.types import User
-#import user
+
 import bot_button
-import bot_data_users
 import threading
 import os
 import sys
-#import timer
+
+from bot_data_users import Backuper
+from bot_data_users import User
 
 TOKEN = os.getenv('TOKEN')
-TOKEN = ''
+TOKEN = '
 if not TOKEN:
     print("ERROR: Not found TOKEN")
     sys.exit(96)
-#print('TOKEN: ', TOKEN)
 bot = telebot.TeleBot(TOKEN)
 
+
+
 def igor():
-    threading.Timer(60.0, igor).start()
-    for key in data_users.usersDict.keys():
+    threading.Timer(300, igor).start()
+    for key in employer.usersDict.keys():
         i = 0
         while i < 1:
-            bot.send_message(int(key), 'Никита помой пол!')
+            bot.send_message(int(key), 'Количество потоков = {}'.format(threading.active_count()))
             i += 1
 
 
@@ -32,12 +34,11 @@ def igor():
 def command_handler(message: Message):
     print("Language is: {}".format(message.from_user.language_code))
     print(message.chat.id)
-    #global usersDict
 
-    with data_users.lock:
-        data_users.usersDict[message.chat.id] = bot_data_users.User(message.chat.id, 18, "RU")
+    with employer.lock:
+        employer.usersDict[message.chat.id] = User(message.chat.id, 18, "RU")
 
-    userTest = data_users.usersDict.get(message.chat.id)
+    userTest = employer.usersDict.get(message.chat.id)
 
     print("TEST RUN CHAR ID {} AGE {} LANGUAGE {}".format(userTest.chatId, userTest.age, userTest.listPhotos[0]))
     bot.send_message(message.chat.id,
@@ -57,9 +58,9 @@ Donate button available. For more information, click on it ‼️
     bot.send_message(message.chat.id, 'С какого уровня начнем?', reply_markup=bot_button.BotButtonRu.btn_chooseCategory)
 
 if __name__ == '__main__':
-    data_users = bot_data_users.cData_users(360, "Thread Backup", bot=bot)
-    data_users.start()
+    employer = Backuper(period=1800, name="employer", bot=bot)
+    employer.start()
     igor()
     bot.polling(timeout=60)
 
-    data_users.end()
+    employer.end()
