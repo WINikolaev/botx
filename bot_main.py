@@ -11,8 +11,8 @@ import sys
 from bot_data_users import Backuper
 from bot_data_users import User
 
-TOKEN = os.getenv('TOKEN')
-TOKEN = '
+TOKEN = os.environ.get('TOKEN')
+
 if not TOKEN:
     print("ERROR: Not found TOKEN")
     sys.exit(96)
@@ -21,11 +21,13 @@ bot = telebot.TeleBot(TOKEN)
 
 
 def igor():
-    threading.Timer(300, igor).start()
+    t = threading.Timer(300, igor)
+    t.setName('NIKITALOX')
+    t.start()
     for key in employer.usersDict.keys():
         i = 0
         while i < 1:
-            bot.send_message(int(key), 'Количество потоков = {}'.format(threading.active_count()))
+            bot.send_message(int(key), '''Количество потоков = {} -> {}'''.format(threading.active_count(), threading.enumerate()))
             i += 1
 
 
