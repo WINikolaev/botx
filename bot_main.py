@@ -1,18 +1,15 @@
 import telebot
 
 from telebot.types import Message
-from telebot.types import User
-
 import bot_button
 import threading
 import os
 import sys
 
-from bot_data_users import Backuper
-from bot_data_users import User
+from user import HandlerUsers
+from user import User
 
 TOKEN = os.environ.get('TOKEN')
-
 if not TOKEN:
     print("ERROR: Not found TOKEN")
     sys.exit(96)
@@ -21,15 +18,14 @@ bot = telebot.TeleBot(TOKEN)
 
 
 def igor():
-    t = threading.Timer(300, igor)
-    t.setName('NIKITALOX')
-    t.start()
     for key in employer.usersDict.keys():
         i = 0
         while i < 1:
             bot.send_message(int(key), '''Количество потоков = {} -> {}'''.format(threading.active_count(), threading.enumerate()))
             i += 1
-
+    t = threading.Timer(300, igor)
+    t.setName('TEST_THREAD')
+    t.start()
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -37,7 +33,7 @@ def command_handler(message: Message):
     print("Language is: {}".format(message.from_user.language_code))
     print(message.chat.id)
 
-    with employer.lock:
+    with employer.handlerLock:
         employer.usersDict[message.chat.id] = User(message.chat.id, 18, "RU")
 
     userTest = employer.usersDict.get(message.chat.id)
@@ -60,8 +56,9 @@ Donate button available. For more information, click on it ‼️
     bot.send_message(message.chat.id, 'С какого уровня начнем?', reply_markup=bot_button.BotButtonRu.btn_chooseCategory)
 
 if __name__ == '__main__':
-    employer = Backuper(period=1800, name="employer", bot=bot)
+    employer = HandlerUsers(period=1800, name="EmployerThread", bot=bot)
     employer.start()
+
     igor()
     bot.polling(timeout=60)
 

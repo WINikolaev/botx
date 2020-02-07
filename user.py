@@ -1,14 +1,12 @@
-from enum import Enum
+import os
+import copy
+import pickle
+import random
+import datetime
 import bot_button
 import handler_photos
-import copy
-import random
 
-
-class Level(Enum):
-    LIGHT = 0
-    MEDIUM = 1
-    HARD = 2
+from cyclic_timer import СyclicTimer as timer
 
 
 class User:
@@ -45,3 +43,37 @@ class User:
 
     def setCurrentLvl(self, currentLvl: int):
         self.currentLvl = currentLvl
+
+
+
+class HandlerUsers(timer):
+    usersDict = {}
+    def __init__(self, period, name=None, bot=None, directory_way=None, backup_name=None):
+        timer.__init__(self, period, name=name)
+        self.bot = bot
+        self.__directory_way    = directory_way if directory_way is not None else ''
+        self.__backup_name      = backup_name if backup_name is not None else 'backup'
+        self.__backup_way       = '{}{}.pickle'.format(self.__directory_way, self.__backup_name)
+
+        self.__load_backup()
+
+    def __load_backup(self):
+        if os.path.exists(self.__backup_way):
+            with open(self.__backup_way, 'rb') as bp:
+                self.usersDict = pickle.load(bp)
+        print('usersDict has -> ', self.usersDict)
+
+    def end(self):
+        self._stop_thread()
+
+    def handler(self):
+        print('usersDict: ', self.usersDict)
+        with open(self.__backup_way, 'wb') as bp:
+            pickle.dump(self.usersDict, bp)
+
+        if self.bot:
+            i = 0
+            for key in self.usersDict.keys():
+                while i < 1:
+                    self.bot.send_message(int(key), 'backup data at {}'.format(datetime.datetime.now()))
+                    i += 1
