@@ -11,16 +11,20 @@ from cyclic_timer import СyclicTimer as timer
 
 class User:
     language_ru = False
-    language_en = False
-    currentLvl = None
 
-    def __init__(self, chatId, age=None, language=None):
+    currentLvl = None
+    age = None
+    fl_more18 = False
+    fl_user_agreement = False
+    first_name = None
+    last_name = None
+    language_code = None
+
+    def __init__(self, chatId, first_name: str, last_name: str, language_code: str):
         self.chatId = chatId
-        self.age = age
-        if language == 'RU':
-            self.button = bot_button.BotButtonRu
-        elif language == 'EN':
-            self.button = bot_button.BotButtonEn
+        self.first_name = first_name
+        self.last_name = last_name
+        self.language_code = language_code
         self.listPhotos = [copy.deepcopy(handler_photos.Photos.photosLight),
                            copy.deepcopy(handler_photos.Photos.photosMedium),
                            copy.deepcopy(handler_photos.Photos.photosHard)]
@@ -45,15 +49,15 @@ class User:
         self.currentLvl = currentLvl
 
 
-
 class HandlerUsers(timer):
-    usersDict = {}
-    def __init__(self, period, name=None, bot=None, directory_way=None, backup_name=None):
+
+    def __init__(self, period, usersDict: dict, name=None, bot=None, directory_way=None, backup_name=None):
         timer.__init__(self, period, name=name)
+        self.usersDict = usersDict
         self.bot = bot
-        self.__directory_way    = directory_way if directory_way is not None else ''
-        self.__backup_name      = backup_name if backup_name is not None else 'backup'
-        self.__backup_way       = '{}{}.pickle'.format(self.__directory_way, self.__backup_name)
+        self.__directory_way = directory_way if directory_way is not None else ''
+        self.__backup_name = backup_name if backup_name is not None else 'backup'
+        self.__backup_way = '{}{}.pickle'.format(self.__directory_way, self.__backup_name)
 
         self.__load_backup()
 

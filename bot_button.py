@@ -32,10 +32,25 @@ class BotButtonRu:
     # btn_miss = types.InlineKeyboardButton('Пасс', callback_data='Miss')
     # markup_inline_state.add(btn_hot, btn_miss)
 
-    # Button for Donate
-    markup_donate = types.ReplyKeyboardMarkup()
-    btn_donate = types.InlineKeyboardButton('Donate🆘')
-    markup_donate.add(btn_donate)
+    # Button for User interface
+    markup_user_buttons = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_donate = types.InlineKeyboardButton('Donate🆘', callback_data='Donate')
+    markup_user_buttons.add(btn_donate, btn_chooseCategory)
+
+    # Button for age initialisation
+    markup_age_init = types.InlineKeyboardMarkup()
+    btn_age_less_18 = types.InlineKeyboardButton('Меньше 18', callback_data='Less18')
+    btn_age_18_25 = types.InlineKeyboardButton('18-25', callback_data='Between_18_25')
+    btn_age_26_33 = types.InlineKeyboardButton('26-33', callback_data='Between_26_33')
+    btn_age_34_41 = types.InlineKeyboardButton('34-41', callback_data='Between_34_41')
+    btn_age_more_41 = types.InlineKeyboardButton('Больше 41', callback_data='More_41')
+    markup_age_init.add(btn_age_less_18, btn_age_18_25, btn_age_26_33, btn_age_34_41, btn_age_more_41)
+
+    # Button for users agreement
+    markup_user_agreement = types.InlineKeyboardMarkup()
+    btn_user_accept = types.InlineKeyboardButton('Да', callback_data='AcceptAgreement')
+    btn_user_decline = types.InlineKeyboardButton('Нет', callback_data='DeclineAgreement')
+    markup_user_agreement.add(btn_user_accept, btn_user_decline)
 
 
 class BotButtonEn:
